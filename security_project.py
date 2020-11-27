@@ -24,7 +24,6 @@ with open("salt.txt", "r") as saltfile:
     print(b64decode(salt))
 
 
-# %%
 from cryptography.fernet import Fernet
 from base64 import b64decode
 import hashlib
@@ -136,14 +135,14 @@ def dictionnary_Attack():
 
 def add_words_dico():
     """adds words to the dictionnary"""
-    print("Write the words you wish to add to the dictionnary, separated by a white space:")
+    print("Write the words you wish to add to the dictionnary, separated by a white space :")
     toAdd = input().strip()
     if len(toAdd):
         with open("words.txt", "a+") as dictionary:
             dictionary.write(toAdd + "\n")
-            print("The words were added successfully.") #checked this with a function to see last n lines of files, will send it to you
+            print("The words were added successfully") #checked this with a function to see last n lines of files, will send it to you
         return
-    print("There were no words.")
+    print("There were no words")
     return
     
             
@@ -151,9 +150,9 @@ def add_words_dico():
             
 def menu_hash():
     print("Menu:")
-    print("1) Hash something.")
-    print("2) Unhash Something.")
-    print("3) Add words to dictionnary.")
+    print("1) Hash something")
+    print("2) Unhash something")
+    print("3) Add words to dictionnary")
     print("4) Quit")
     a = input() # to get input from the user
     if(a == "1"):
@@ -179,7 +178,7 @@ def menu_crypt():
         
 
 print("Choose what you'd like to work on:")
-print("1) Hashing, and attacking a hashed password.")
+print("1) Hashing, and attacking a hashed password")
 print("2) Symmetric encryption and decryption")
 print("3) Asymmetric encryption and decryption")
 print("4) Quit")
@@ -190,10 +189,3 @@ if o == "2":
     menu_crypt()
 if o == "4":
     exit()
-                
-        
-
-# %%
-
-
-
