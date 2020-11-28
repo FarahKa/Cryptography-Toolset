@@ -2,10 +2,10 @@ import binascii
 import os
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa, utils
 from cryptography.hazmat.primitives.serialization import load_pem_public_key, load_pem_private_key
+from cryptography.exceptions import InvalidSignature
 
 
 def rsa_key_generation(key_size, public_exponent):
@@ -41,17 +41,23 @@ def save_keys_to_file(private_key, filename, enc_password):
 
 
 def load_private_key_from_file(filename, enc_password):
-    with open("private_keys/rsa/" + filename, 'rb') as pem_in:
-        pemlines = pem_in.read()
-    private_key = load_pem_private_key(pemlines, enc_password, default_backend())
-    return private_key
+    try:
+        with open("private_keys/rsa/" + filename, 'rb') as pem_in:
+            pemlines = pem_in.read()
+        private_key = load_pem_private_key(pemlines, enc_password, default_backend())
+        return private_key
+    except FileNotFoundError:
+        print("Can't find key oops")
 
 
 def load_public_key_from_file(filename, ):
-    with open("public_keys/rsa/" + filename, 'rb') as pem_in:
-        pemlines = pem_in.read()
-    public_key = load_pem_public_key(pemlines)
-    return public_key
+    try:
+        with open("public_keys/rsa/" + filename, 'rb') as pem_in:
+            pemlines = pem_in.read()
+        public_key = load_pem_public_key(pemlines, default_backend())
+        return public_key
+    except FileNotFoundError:
+        print("Can't find key oops")
 
 
 # RSA
@@ -79,6 +85,56 @@ def decryptt(private_key, ciphertext):
     )
     # decrypted_cipher_text = plaintext.decode('utf-8')
     print("Decrypted : " + str(plaintext))
+
+
+def prehash():
+    print("Is the message pre hashed ?(yes/no)")
+    yes = input()
+    if yes == "yes":
+        # function tprinti l hashes wl user ya5tar
+        chosen_hash = hashes.SHA256()
+        hashh = utils.Prehashed(chosen_hash)
+    if yes == "no":
+        hashh = hashes.SHA256()
+    else:
+        return
+    return hashh
+
+
+def sign(private_key, message):
+    hashh = prehash()
+    if not hashh:
+        return
+    signature = private_key.sign(
+        message.encode("utf-8"),
+        padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH),
+        hashh
+    )
+    print("Message : ")
+    print(message)
+    print("Signature : ")
+    print(binascii.hexlify(signature).decode("utf-8"))
+
+
+def verify(public_key, signature, message):
+    hashh = prehash()
+    if not hashh:
+        return
+    try:
+        public_key.verify(
+            binascii.unhexlify(signature),
+            message.encode("utf-8"),
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashh
+        )
+        print('Signature matches yay')
+    except InvalidSignature:
+        print("Signature does not match")
 
 
 def list_public_keys():
