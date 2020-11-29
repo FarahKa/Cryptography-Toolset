@@ -1,4 +1,6 @@
 import os
+from builtins import memoryview
+
 from cryptography.exceptions import UnsupportedAlgorithm
 import asymmetric_ecies
 import asymmetric_rsa
@@ -9,10 +11,10 @@ os.makedirs("private_keys/ecies", exist_ok=True)
 os.makedirs("public_keys/ecies", exist_ok=True)
 
 
-def provide_encryption_password():
+def provide_encryption_password(new_or_old=''):
     enc_password = ''
     while not enc_password:
-        print("Please provide encryption password : ")
+        print("Please provide" + new_or_old + " encryption password : ")
         enc_password = input()
         if not enc_password:
             print("password can't be empty")
@@ -27,6 +29,7 @@ def algorithms():
         print("2) ECIES : Elliptic Curve Integrated Encryption Scheme")
         i = input()
     return i
+
 
 def provide_public_key(algo):
     print("Choose which way to load public key:")
@@ -64,6 +67,7 @@ def asymmetric_encryption(algo):
     if algo == "2":
         asymmetric_ecies.encryptt(public_key, message)
 
+
 def provide_private_key(algo):
     print("Choose which way to load private key:")
     print("1) Load key from file")
@@ -80,16 +84,17 @@ def provide_private_key(algo):
             key_name = input()
             enc_password = provide_encryption_password()
             private_key = asymmetric_rsa.load_private_key_from_file(key_name + "_rsaprivkey.pem",
-                                                                    enc_password.encode('utf-8'))
+                                                                    enc_password)
         if algo == "2":
             print("Please provide key name")
             key_name = input()
             enc_password = provide_encryption_password()
             private_key = asymmetric_ecies.load_private_key_from_file(key_name + "_eciesprivkey",
-                                                                      enc_password.encode('utf-8'))
+                                                                      enc_password)
         if not private_key:
             return
-    return  private_key
+    return private_key
+
 
 def asymmetric_decryption(algo):
     print("Provide the ciphertext you'd like to decrypt:")
@@ -101,7 +106,6 @@ def asymmetric_decryption(algo):
         asymmetric_rsa.decryptt(private_key, ciphertext)
     # ECIES
     if algo == "2":
-
         asymmetric_ecies.decryptt(private_key, ciphertext)
 
 
@@ -173,7 +177,7 @@ def sign(algo):
     if algo == "1":
         asymmetric_rsa.sign(private_key, msg)
     if algo == "2":
-        asymmetric_ecies.sign()
+        asymmetric_ecies.sign(private_key,msg)
 
 
 def verify(algo):
@@ -185,7 +189,24 @@ def verify(algo):
     if algo == "1":
         asymmetric_rsa.verify(public_key, sig, msg)
     if algo == "2":
-        asymmetric_ecies.verify()
+        asymmetric_ecies.verify(public_key,sig,msg)
+
+
+def change_pwd_private_key(algo):
+    print("Please provide key name")
+    key_name = input()
+    enc_password = provide_encryption_password(" old")
+    if algo == "1":
+        private_key = asymmetric_rsa.load_private_key_from_file(key_name + "_rsaprivkey.pem",
+                                                                enc_password)
+        new_enc_password = provide_encryption_password(" new")
+        asymmetric_rsa.save_keys_to_file(private_key, key_name + "_rsaprivkey.pem", new_enc_password)
+    if algo == "2":
+        private_key = asymmetric_ecies.load_private_key_from_file(key_name + "_eciesprivkey",
+                                                                  enc_password)
+        public_key = asymmetric_ecies.load_public_key_from_file(key_name + "_eciespubkey")
+        new_enc_password = provide_encryption_password(" new")
+        asymmetric_ecies.save_keys_to_file(private_key, public_key, key_name + "_eciesprivkey", new_enc_password)
 
 
 def menu_asym():
@@ -197,6 +218,7 @@ def menu_asym():
     print("5) Verify a message")
     print("6) List saved public keys")
     print("7) List saved private keys")
+    print("8) Change a saved private key's encryption password")
     o = input()
     error_m = 'Asymmetric encryption failed'
     try:
@@ -215,8 +237,7 @@ def menu_asym():
             list_public_keys(algorithms())
         if o == "7":
             list_private_keys(algorithms())
+        if o == "8":
+            change_pwd_private_key(algorithms())
     except UnsupportedAlgorithm:
         print(error_m)
-
-
-menu_asym()

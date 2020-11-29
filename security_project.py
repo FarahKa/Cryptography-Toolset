@@ -3,16 +3,21 @@
 # %%
 # How I generated the salt and saved it, this will not be run every time.
 import os
+import gc
 import hashlib
 import base64
 from base64 import b64encode
 from base64 import b64decode
+from os import listdir
+from os.path import isfile, join
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from asymmetric_stuff import menu_asym
+from itertools import combinations_with_replacement
 
 
-def sym_encrypt(message,password):
+def sym_encrypt(message, password):
     with open("salt.txt", "r") as saltfile:  # retreiving the salt from the salt file
         salt = b64decode(saltfile.readline())
     kdf = PBKDF2HMAC(
@@ -47,7 +52,7 @@ def symmetric_encryption():
     input()
 
 
-def sym_decrypt(message,password):
+def sym_decrypt(message, password):
     with open("salt.txt", "r") as saltfile:  # retreiving the salt from the salt file
         salt = b64decode(saltfile.readline())
 
@@ -68,35 +73,39 @@ def symmetric_decryption():
     message = input()
     print("Provide the password you'd like to decrypt it with:")
     password = input()
-    decrypted = sym_decrypt(message,password)
+    decrypted = sym_decrypt(message, password)
     print("Your decrypted message is:")
     print(decrypted)
 
 
-def hashing():
-    """Hashes the given message."""
-    print("Choose a hash algorithm:")
-    print(hashlib.algorithms_available)  # lists all the available algorithms we can use
-    algo = input()  # we'll have to check li el user input is fel algorithms_available
-    if algo not in hashlib.algorithms_available:
-        print("Algorithme choisi non valide")
-        return
-    print("What do you want to hash?")
-    toHash = input()
-    print("The hash is:")
-    h = hashlib.new(algo)  # creates an object that can hash stuff with the algorithm you give it
-    h.update(
-        toHash.encode())  # update adds the stuff you want to hash, encode is because youhave to give it something binary, not a string
-    print(h.hexdigest())  # hexdigest gives you the hash.yeyyyyyy done
-
-
-def dictionnary_Attack():
-    """Attacks the password using a dictionnary"""
-    print("Choose the hash algorithm with which the password was hashed:")
+def choose_hash():
+    print("Choose the hash algorithm :")
     print(hashlib.algorithms_available)  # lists all the available algorithms we can use
     algo = input()  # we'll have to check li el user input is fel algorithms_available
     if algo not in hashlib.algorithms_available:
         print("Algorithm is unavailable.")
+        return
+    return algo
+
+
+def hashing():
+    """Hashes the given message."""
+    algo = choose_hash()
+    if not algo:
+        return
+    h = hashlib.new(algo)
+    print("What do you want to hash?")
+    to_hash = input()
+    print("The hash is:")
+    h.update(
+        to_hash.encode())  # update adds the stuff you want to hash, encode is because youhave to give it something binary, not a string
+    print(h.hexdigest())  # hexdigest gives you the hash.yeyyyyyy done
+
+
+def dictionary_attack():
+    """Attacks the password using a dictionary"""
+    algo = choose_hash()
+    if not algo:
         return
     hasher = hashlib.new(algo)
     print("Write the hashed password you want to attack:")
@@ -106,7 +115,7 @@ def dictionnary_Attack():
     if len(hpassword) != len(hasher.hexdigest()):
         print("The given hash does not have the right length for the given algorithm.")
         return
-    with open("words.txt", "r") as dictionary:  # opening the file dictionnary
+    with open("words.txt", "r") as dictionary:  # opening the file dictionary
         for line in dictionary:  # treating it line by line
             words = line.split()  # lines contain many words so we split on whitespaces
             for word in words:
@@ -120,13 +129,39 @@ def dictionnary_Attack():
     return
 
 
-def add_words_dico():
-    """adds words to the dictionnary"""
-    print("Write the words you wish to add to the dictionnary, separated by a white space :")
-    toAdd = input().strip()
-    if len(toAdd):
-        with open("words.txt", "a+") as dictionary:
-            dictionary.write(toAdd + "\n")
+def get_dic_names():
+    return [f for f in listdir("dics/") if isfile(join("dics/", f))]
+
+
+def create_dictionary():
+    print("Dictionary name ?")
+    name = input()
+    if ' ' in name or not name:
+        return
+    name = name.split(".txt")[0]
+    if name in get_dic_names():
+        print("Dictionary already exists")
+        return
+    with open("dics/" + name, "w") as dictionary:
+        print("The dictionary '"+name+"' was successfully created")
+
+
+def add_words_to_dictionary():
+    """adds words to a dictionary"""
+    print("Choose a dictionary :")
+    dics = get_dic_names()
+    for index, dic in enumerate(dics):
+        print(str(index)+") "+dic.split(".txt")[0])
+    i = input()
+    try:
+        i = int(i)
+    except:
+        return
+    print("Write the words you wish to add to the dictionary, separated by a white space :")
+    to_add = input().strip()
+    if len(to_add):
+        with open("dics/"+dics[i], "a+") as dictionary:
+            dictionary.write(to_add + "\n")
             print(
                 "The words were added successfully")  # checked this with a function to see last n lines of files, will send it to you
         return
@@ -134,20 +169,94 @@ def add_words_dico():
     return
 
 
-def menu_hash():
+def simple_brute_force_attack():
+    # get l alphabet mt3na li hia hex
+    stuff = []
+    for chars in range(92):
+        stuff.append(chr(chars + 33))
+    print(stuff)
+    # get l hasher
+    algo = choose_hash()
+    if not algo:
+        return
+    print("Write the hashed password:")
+    hpassword = input()
+    print("Provide the maximum length of the password (keep it short please):")
+    max_len = input()
+    try:
+        max_len = int(max_len)
+    except:
+        print("You haven't provided an int tf")
+        return
+    for i in range(max_len):
+        if i == 0:
+            for el in stuff:
+                hasher = hashlib.new(algo)
+                hasher.update(el.encode())
+                if hasher.hexdigest() == hpassword:
+                    print("Cracked password : " + ''.join(el))
+                    return
+            n = gc.collect()  # clean up
+        else:
+            possible_words = list(combinations_with_replacement(stuff, i + 1))
+            for word in possible_words:
+                hasher = hashlib.new(algo)
+                for thing in word:
+                    hasher.update(thing.encode())
+                if hasher.hexdigest() == hpassword:
+                    print("Cracked password : " + ''.join(word))
+                    return
+    print("Couldn't crack password with simple brute force")
+
+
+def identify_hash():
+    s = hashlib.algorithms_available
+    print("Write the hashed message (must be hex for now):")
+    hash = input()  # we'll have to check li el user input is fel algorithms_available
+    size = len(hash) * 4
+    print("Possible hash algorithms :")
+    for algo in s:
+        hasher = hashlib.new(algo)
+        if (hasher.digest_size * 8) == size:
+            print("     - " + algo)
+
+
+def menu_attack():
     print("Menu:")
-    print("1) Hash something")
-    print("2) Unhash something")
-    print("3) Add words to dictionnary")
+    print("1) Dictionary attack")
+    print("2) Simple brute force attack")
+    print("3) Identify hash algorithm")
     print("4) Quit")
     a = input()  # to get input from the user
-    if (a == "1"):
+    if a == "1":
+        dictionary_attack()
+    if a == "2":
+        simple_brute_force_attack()
+    if a == "3":
+        add_words_to_dictionary()
+    if a == "4":
+        identify_hash()
+    if a == "5":
+        return
+
+
+def menu_hash():
+    print("Menu:")
+    print("1) Hash a message")
+    print("2) Crack a hashed message")
+    print("3) Create a dictionary")
+    print("4) Add words to an existing dictionary")
+    print("5) Quit")
+    a = input()  # to get input from the user
+    if a == "1":
         hashing()
-    if (a == "2"):
-        dictionnary_Attack()
-    if (a == "3"):
-        add_words_dico()
-    if (a == "4"):
+    if a == "2":
+        menu_attack()
+    if a == "3":
+        create_dictionary()
+    if a == "4":
+        add_words_to_dictionary()
+    if a == "5":
         return
 
 
@@ -172,26 +281,30 @@ if __name__ == "__main__":
     salt = b64encode(salt).decode('ascii')
     with open("salt.txt", "a+") as saltfile:
         saltfile.write(salt)
-    exit()
+    # exit()
 
     # b'(,<\xc4\x8ao\x95\xf3\xd4(\xeeA\x96{\x88%'
 
     # %%
     # test on reading the salt, also won't be run
 
+    os.makedirs("dics", exist_ok=True)
     with open("salt.txt", "r") as saltfile:
         salt = saltfile.readline()
         print(salt)
         print(b64decode(salt))
     print("Choose what you'd like to work on:")
-    print("1) Hashing, and attacking a hashed password")
-    print("2) Symmetric encryption and decryption")
-    print("3) Asymmetric encryption and decryption")
-    print("4) Quit")
+    print("1) Encoding and decoding")
+    print("2) Hashing and attacking a hashed password")
+    print("3) Symmetric encryption and decryption")
+    print("4) Asymmetric encryption and decryption")
+    print("5) Quit")
     o = input()
-    if o == "1":
-        menu_hash()
     if o == "2":
+        menu_hash()
+    if o == "3":
         menu_crypt()
     if o == "4":
+        menu_asym()
+    if o == "5":
         exit()

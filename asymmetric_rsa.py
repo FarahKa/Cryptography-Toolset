@@ -44,7 +44,7 @@ def load_private_key_from_file(filename, enc_password):
     try:
         with open("private_keys/rsa/" + filename, 'rb') as pem_in:
             pemlines = pem_in.read()
-        private_key = load_pem_private_key(pemlines, enc_password, default_backend())
+        private_key = load_pem_private_key(pemlines, bytes(enc_password,'utf-8'), default_backend())
         return private_key
     except FileNotFoundError:
         print("Can't find key oops")
@@ -60,7 +60,6 @@ def load_public_key_from_file(filename, ):
         print("Can't find key oops")
 
 
-# RSA
 def encryptt(public_key, message):
     ciphertext = public_key.encrypt(
         message,
@@ -73,7 +72,6 @@ def encryptt(public_key, message):
     print("Encrypted : " + binascii.hexlify(ciphertext).decode("utf-8"))
 
 
-# RSA
 def decryptt(private_key, ciphertext):
     plaintext = private_key.decrypt(
         binascii.unhexlify(ciphertext),
@@ -154,3 +152,5 @@ def list_private_keys():
             key = pem_in.read()
         print(f + " :")
         print(key.decode("utf-8"))
+
+
