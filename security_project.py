@@ -233,10 +233,8 @@ def menu_attack():
     if a == "2":
         simple_brute_force_attack()
     if a == "3":
-        add_words_to_dictionary()
-    if a == "4":
         identify_hash()
-    if a == "5":
+    if a == "4":
         return
 
 
