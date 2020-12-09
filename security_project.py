@@ -102,8 +102,29 @@ def hashing():
     print(h.hexdigest())  # hexdigest gives you the hash.yeyyyyyy done
 
 
+def choose_dictionary():
+    print("Choose a dictionary :")
+    dics = get_dic_names()
+    for index, dic in enumerate(dics):
+        print(str(index) + ") " + dic.split(".txt")[0])
+    i = input()
+    try:
+        i = int(i)
+        if i >= len(dics):
+            print("can't find the dictionary with the index " + str(i))
+            return -1
+        return dics[i]
+    except:
+        print(str(i)+" isnt an int")
+        return -1
+
+
 def dictionary_attack():
     """Attacks the password using a dictionary"""
+    dic = choose_dictionary()
+    if dic == -1:
+        return
+
     algo = choose_hash()
     if not algo:
         return
@@ -115,7 +136,7 @@ def dictionary_attack():
     if len(hpassword) != len(hasher.hexdigest()):
         print("The given hash does not have the right length for the given algorithm.")
         return
-    with open("words.txt", "r") as dictionary:  # opening the file dictionary
+    with open("dics/"+dic, "r") as dictionary:  # opening the file dictionary
         for line in dictionary:  # treating it line by line
             words = line.split()  # lines contain many words so we split on whitespaces
             for word in words:
@@ -146,21 +167,17 @@ def create_dictionary():
         print("The dictionary '"+name+"' was successfully created")
 
 
+
+
 def add_words_to_dictionary():
     """adds words to a dictionary"""
-    print("Choose a dictionary :")
-    dics = get_dic_names()
-    for index, dic in enumerate(dics):
-        print(str(index)+") "+dic.split(".txt")[0])
-    i = input()
-    try:
-        i = int(i)
-    except:
+    dic = choose_dictionary()
+    if dic == -1:
         return
     print("Write the words you wish to add to the dictionary, separated by a white space :")
     to_add = input().strip()
     if len(to_add):
-        with open("dics/"+dics[i], "a+") as dictionary:
+        with open("dics/"+dic, "a+") as dictionary:
             dictionary.write(to_add + "\n")
             print(
                 "The words were added successfully")  # checked this with a function to see last n lines of files, will send it to you
