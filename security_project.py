@@ -39,7 +39,7 @@ def symmetric_encryption():
     message = input()
     print("Provide the password you'd like to encrypt it with:")
     password = input()
-    encrypted = sym_encrypt(message)
+    encrypted = sym_encrypt(message, password)
     print("Your symetrically encrypted message is:")
     print(encrypted.decode('ascii'))
     print("Would you like to save your encrypted message to a file? y/n")
