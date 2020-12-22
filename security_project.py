@@ -1,7 +1,5 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
-# %%
-# How I generated the salt and saved it, this will not be run every time.
 import os
 import gc
 import hashlib
@@ -49,7 +47,6 @@ def symmetric_encryption():
         filename = input()
         with open(filename.strip() + ".txt", "w") as messageFile:
             messageFile.write(encrypted.decode('ascii'))
-    input()
 
 
 def sym_decrypt(message, password):
@@ -286,10 +283,8 @@ def menu_crypt():
         symmetric_decryption()
 
 
-if __name__ == "__main__":
-    # bch when i import this to use l encryption mayrunnich all this 3andi
-    # stuff only to run when not called via 'import' here
-
+def gen_salt():
+    """Function that was used to generate the salt in the salt file."""
     salt = os.urandom(16)
     print(salt)
     print(type(salt))
@@ -297,17 +292,59 @@ if __name__ == "__main__":
     with open("salt.txt", "a+") as saltfile:
         saltfile.write(salt)
     # exit()
-
     # b'(,<\xc4\x8ao\x95\xf3\xd4(\xeeA\x96{\x88%'
 
-    # %%
-    # test on reading the salt, also won't be run
-
-    os.makedirs("dics", exist_ok=True)
+# test on reading the salt, also won't be run
+def read_salt():
     with open("salt.txt", "r") as saltfile:
         salt = saltfile.readline()
-        print(salt)
-        print(b64decode(salt))
+    print(salt)
+    print(b64decode(salt))
+
+def encode():
+    print("State the encoding type: (exp: base64 )")
+    entype = input()
+    print("State the message you would like to encode:") 
+    message = input()
+    encodeTypes=["utf-8", "ascii"]
+    if(entype in encodeTypes ):
+        print("Your encoded message is:")  
+        print(message.encode(entype))
+    if(entype == "base64"):
+        print("Your encoded message is:")  
+        print(b64encode(message.encode()))       
+
+
+def decode():
+    print("State the encoding type: (exp: base64 )")
+    entype = input()
+    print("State the message you would like to decode:") 
+    message = input()
+    encodeTypes=["utf-8", "ascii"]
+    if(entype in encodeTypes ):
+        print("Your decoded message is:")  
+        print(message.decode(entype))
+    if(entype == "base64"):
+        print("Your decoded message is:")  
+        print(b64decode(message.encode()).decode('utf-8'))       
+
+
+def menu_encode():
+    print("Choose what you'd like to work on:")
+    print("1) Encoding")
+    print("2) Decoding")
+    o = input()
+    if o == "1":
+        encode()
+    if o == "2":
+        decode()
+
+
+if __name__ == "__main__":
+    # bch when i import this to use l encryption mayrunnich all this 3andi
+    # stuff only to run when not called via 'import' here
+
+    os.makedirs("dics", exist_ok=True)
     print("Choose what you'd like to work on:")
     print("1) Encoding and decoding")
     print("2) Hashing and attacking a hashed password")
@@ -315,6 +352,8 @@ if __name__ == "__main__":
     print("4) Asymmetric encryption and decryption")
     print("5) Quit")
     o = input()
+    if o == "1":
+        menu_encode()
     if o == "2":
         menu_hash()
     if o == "3":
