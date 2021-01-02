@@ -17,15 +17,50 @@ def menu_encode():
     if o == "2":
         encoding.decode()
 
+
+def menu_encrypt():
+    print("Menu: Choose an algorithm:")
+    print("1) AES with CTR")
+    print("2) AES with CBC")
+    print("3) Camellia (cbc)")
+    print("4) ChaCha20")
+    o = input()
+    if o == "1":
+        symen.symen_AES_CTR()
+    if o == "2":
+        symen.symen_AES_CBC()
+    if o == "3":
+        symen.symen_Camellia()
+    if o == "4":
+        symen.symen_ChaCha20()
+
+def menu_decrypt():
+    print("Menu: Choose an algorithm:")
+    print("1) AES with CTR")
+    print("2) AES with CBC")
+    print("3) Camellia (cbc)")
+    print("4) ChaCha20")
+    o = input()
+    if o == "1":
+        symen.symdec_AES_CTR()
+    if o == "2":
+        symen.symdec_AES_CBC()
+    if o == "3":
+        symen.symdec_Camellia()
+    if o == "4":
+        symen.symdec_ChaCha20()
+
 def menu_crypt():
     print("Menu:")
     print("1) Symmetrically encrypt a message")
     print("2) Symmetrically decrypt a message")
     o = input()
     if o == "1":
-        symen.symmetric_encryption()
+        menu_encrypt()
     if o == "2":
-        symen.symmetric_decryption()
+        menu_decrypt()
+
+
 
 def menu_hash():
     print("Menu:")

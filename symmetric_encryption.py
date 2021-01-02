@@ -8,8 +8,76 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
 import hashlib
 
+def pad(message, blockSize):
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(message) + padder.finalize()
+    return padded_data
+
+def unpad(message, blockSize):
+    unpadder = padding.PKCS7(128).unpadder()
+    data = unpadder.update(message) + unpadder.finalize()
+    return(data)
+
+def symen_AES_CBC():
+    """encrypts using AES in CBC (block, padding) mode"""
+    backend = default_backend()
+    print("Give the message you would like to encrypt:")
+    message = input().encode()
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    # print("key ", key) # key is bytes
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        # print(iv)
+        iv= iv.encode()
+        iv= b64decode(iv) #iv is bytes
+        # print("iv ", iv)
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    message = pad(message, 128)
+    ct = encryptor.update(message) + encryptor.finalize()
+    # print("Returned encryption: ", ct)
+    plain = b64encode(ct).decode()
+    print("Le message crypté est : ", plain)
+    # print("in reverse:")
+    # print(b64decode(plain.encode()))
+    # decryptor = cipher.decryptor()
+    # print(decryptor.update(ct) + decryptor.finalize())
+
+def symdec_AES_CBC():
+    """decrypts using AES in CBC (block, padding) mode"""
+    backend = default_backend()
+    print("Give the message you would like to decrypt:")
+    message = input()
+    # print("what we'll use here:")
+    to_use=b64decode(message.encode())
+    # print(to_use)
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    # print("key is ", key)
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv)
+        # print("iv ", iv)
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
+    # encryptor = cipher.encryptor()
+    # ct = encryptor.update(message.encode()) + encryptor.finalize()
+    decryptor = cipher.decryptor()
+    # print("Le message décrypté est:")
+    dc = decryptor.update(to_use) + decryptor.finalize()
+    # print(dc)
+    dc = unpad(dc, 128)
+    print("Le message en décrypté est: ", dc.decode())
 
 def sym_encrypt(message, password):
     with open("salt.txt", "r") as saltfile:  # retreiving the salt from the salt file
@@ -98,7 +166,6 @@ def symen_AES_CTR():
     # decryptor = cipher.decryptor()
     # print(decryptor.update(ct) + decryptor.finalize())
 
-
 def symdec_AES_CTR():
     """decrypts using AES in CTR (stream, no padding) mode"""
     backend = default_backend()
@@ -112,12 +179,12 @@ def symdec_AES_CTR():
     hasher = hashlib.new("SHA256")
     hasher.update(password.encode())
     key = hasher.digest()
-    print("key is ", key)
+    # print("key is ", key)
     with open("iv.txt", "r") as ivfile:
         iv = ivfile.readline()
         iv= iv.encode()
         iv= b64decode(iv)
-        print("iv ", iv)
+        # print("iv ", iv)
     cipher = Cipher(algorithms.AES(key), modes.CTR(iv), backend=backend)
     # encryptor = cipher.encryptor()
     # ct = encryptor.update(message.encode()) + encryptor.finalize()
@@ -126,5 +193,90 @@ def symdec_AES_CTR():
     dc = decryptor.update(to_use) + decryptor.finalize()
     # print(dc)
     print("Le message en décrypté est: ", dc.decode())
-symen_AES_CTR()
-symdec_AES_CTR()
+
+def symen_Camellia():
+    """encrypts using Camellia (block, padding) mode"""
+    backend = default_backend()
+    print("Give the message you would like to encrypt:")
+    message = input().encode()
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv) #iv is bytes
+    cipher = Cipher(algorithms.Camellia(key), modes.CBC(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    message = pad(message, 128)
+    ct = encryptor.update(message) + encryptor.finalize()
+    plain = b64encode(ct).decode()
+    print("Le message crypté est : ", plain)
+
+def symdec_Camellia():
+    """decrypts using Camellia (block, padding) mode"""
+    backend = default_backend()
+    print("Give the message you would like to decrypt:")
+    message = input()
+    to_use=b64decode(message.encode())
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv)
+    cipher = Cipher(algorithms.Camellia(key), modes.CBC(iv), backend=backend)
+    decryptor = cipher.decryptor()
+    dc = decryptor.update(to_use) + decryptor.finalize()
+    dc = unpad(dc, 128)
+    print("Le message en décrypté est: ", dc.decode())
+
+
+def symen_ChaCha20():
+    """encrypts using AES in CTR (stream, no padding) mode"""
+    backend = default_backend()
+    print("Give the message you would like to encrypt:")
+    message = input().encode()
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv) #iv is bytes
+    cipher = Cipher(algorithms.ChaCha20(key, iv), mode=None, backend=backend)
+    encryptor = cipher.encryptor()
+    ct = encryptor.update(message) + encryptor.finalize()
+    plain = b64encode(ct).decode()
+    print("Le message crypté est : ", plain)
+
+def symdec_ChaCha20():
+    """decrypts using ChaCha20"""
+    backend = default_backend()
+    print("Give the message you would like to decrypt:")
+    message = input()
+    to_use=b64decode(message.encode())
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("SHA256")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv)
+        # print("iv ", iv)
+    cipher = Cipher(algorithms.ChaCha20(key, iv), mode=None, backend=backend)
+    decryptor = cipher.decryptor()
+    dc = decryptor.update(to_use) + decryptor.finalize()
+    print("Le message en décrypté est: ", dc.decode())
+
+
+
