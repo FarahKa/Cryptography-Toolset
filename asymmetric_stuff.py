@@ -209,35 +209,35 @@ def change_pwd_private_key(algo):
         asymmetric_ecies.save_keys_to_file(private_key, public_key, key_name + "_eciesprivkey", new_enc_password)
 
 
-def menu_asym():
-    print("Menu:")
-    print("1) Generate keys")
-    print("2) Asymmetrically encrypt a message")
-    print("3) Asymmetrically decrypt a message")
-    print("4) Sign a message")
-    print("5) Verify a message")
-    print("6) List saved public keys")
-    print("7) List saved private keys")
-    print("8) Change a saved private key's encryption password")
-    o = input()
-    error_m = 'Asymmetric encryption failed'
-    try:
-        if o == "1":
-            generate_keys(algorithms())
-        if o == "2":
-            asymmetric_encryption(algorithms())
-        if o == "3":
-            asymmetric_decryption(algorithms())
-            error_m = "Asymmetric decryption failed"
-        if o == "4":
-            sign(algorithms())
-        if o == "5":
-            verify(algorithms())
-        if o == "6":
-            list_public_keys(algorithms())
-        if o == "7":
-            list_private_keys(algorithms())
-        if o == "8":
-            change_pwd_private_key(algorithms())
-    except UnsupportedAlgorithm:
-        print(error_m)
+# def menu_asym():
+#     print("Menu:")
+#     print("1) Generate keys")
+#     print("2) Asymmetrically encrypt a message")
+#     print("3) Asymmetrically decrypt a message")
+#     print("4) Sign a message")
+#     print("5) Verify a message")
+#     print("6) List saved public keys")
+#     print("7) List saved private keys")
+#     print("8) Change a saved private key's encryption password")
+#     o = input()
+#     error_m = 'Asymmetric encryption failed'
+#     try:
+#         if o == "1":
+#             generate_keys(algorithms())
+#         if o == "2":
+#             asymmetric_encryption(algorithms())
+#         if o == "3":
+#             asymmetric_decryption(algorithms())
+#             error_m = "Asymmetric decryption failed"
+#         if o == "4":
+#             sign(algorithms())
+#         if o == "5":
+#             verify(algorithms())
+#         if o == "6":
+#             list_public_keys(algorithms())
+#         if o == "7":
+#             list_private_keys(algorithms())
+#         if o == "8":
+#             change_pwd_private_key(algorithms())
+#     except UnsupportedAlgorithm:
+#         print(error_m)

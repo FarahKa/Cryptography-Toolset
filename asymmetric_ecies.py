@@ -19,7 +19,7 @@ def ecies_key_generation():
 
 def save_keys_to_file(private_key_hex, public_key_hex, filename, enc_password):
     # encrypt key first
-    from security_project import sym_encrypt
+    from symmetric_encryption import sym_encrypt
     with open("private_keys/ecies/" + filename, 'wb') as out:
         out.write(sym_encrypt(private_key_hex, enc_password))
 
@@ -32,7 +32,7 @@ def load_private_key_from_file(filename, enc_password):
     try:
         with open("private_keys/ecies/" + filename, 'rb') as out:
             key = out.read()
-        from security_project import sym_decrypt
+        from symmetric_encryption import sym_decrypt
         return sym_decrypt(key.decode("utf-8"), enc_password)
     except FileNotFoundError:
         print("Can't find key oops")
