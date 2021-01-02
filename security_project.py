@@ -295,6 +295,18 @@ def gen_salt():
     # exit()
     # b'(,<\xc4\x8ao\x95\xf3\xd4(\xeeA\x96{\x88%'
 
+def gen_iv():
+    """Function that was used to generate the iv in the iv file."""
+    iv = os.urandom(16)
+    print(iv)
+    print(type(iv))
+    print(len(iv))
+    iv = b64encode(iv).decode('ascii')
+    with open("iv.txt", "w") as ivf:
+        ivf.write(iv)
+gen_iv()
+
+
 # test on reading the salt, also won't be run
 def read_salt():
     with open("salt.txt", "r") as saltfile:
