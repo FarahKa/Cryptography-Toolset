@@ -24,6 +24,7 @@ def menu_encrypt():
     print("2) AES with CBC")
     print("3) Camellia (cbc)")
     print("4) ChaCha20")
+    print("5) Triple DES")
     o = input()
     if o == "1":
         symen.symen_AES_CTR()
@@ -33,6 +34,8 @@ def menu_encrypt():
         symen.symen_Camellia()
     if o == "4":
         symen.symen_ChaCha20()
+    if o == "5":
+        symen.symen_TripleDES()
 
 def menu_decrypt():
     print("Menu: Choose an algorithm:")
@@ -40,6 +43,7 @@ def menu_decrypt():
     print("2) AES with CBC")
     print("3) Camellia (cbc)")
     print("4) ChaCha20")
+    print("5) Triple DES")
     o = input()
     if o == "1":
         symen.symdec_AES_CTR()
@@ -49,6 +53,8 @@ def menu_decrypt():
         symen.symdec_Camellia()
     if o == "4":
         symen.symdec_ChaCha20()
+    if o == "5":
+        symen.symdec_TripleDES()
 
 def menu_crypt():
     print("Menu:")

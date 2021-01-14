@@ -280,3 +280,45 @@ def symdec_ChaCha20():
 
 
 
+def symen_TripleDES():
+    """encrypts using Triple DES"""
+    backend = default_backend()
+    print("Give the message you would like to encrypt:")
+    message = input().encode()
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("MD5")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv)[:8] #iv is bytes
+    cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    message = pad(message, 128)
+    ct = encryptor.update(message) + encryptor.finalize()
+    plain = b64encode(ct).decode()
+    print("Le message crypté est : ", plain)
+
+def symdec_TripleDES():
+    """decrypts using Triple DES"""
+    backend = default_backend()
+    print("Give the message you would like to decrypt:")
+    message = input()
+    to_use=b64decode(message.encode())
+    print("Give the password you would like to use:")
+    password = input()
+    hasher = hashlib.new("MD5")
+    hasher.update(password.encode())
+    key = hasher.digest()
+    with open("iv.txt", "r") as ivfile:
+        iv = ivfile.readline()
+        iv= iv.encode()
+        iv= b64decode(iv)[:8]
+        # print("iv ", iv)
+    cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv), backend=backend)
+    decryptor = cipher.decryptor()
+    dc = decryptor.update(to_use) + decryptor.finalize()
+    dc = unpad(dc, 128)
+    print("Le message en décrypté est: ", dc.decode())
