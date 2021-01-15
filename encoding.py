@@ -50,5 +50,3 @@ def decode():
     #     print("Your decoded message is:")  
     #     print(b64decode(message).decode("utf-8", 'ignore'))
 
-
-decode()
