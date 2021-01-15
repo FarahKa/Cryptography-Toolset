@@ -1,0 +1,1 @@
+b'abcc\xc3\xa7\xc3\xa0'

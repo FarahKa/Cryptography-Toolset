@@ -7,15 +7,15 @@ from cryptography.exceptions import UnsupportedAlgorithm
 
 
 
-def menu_encode():
-    print("Choose what you'd like to work on:")
-    print("1) Encoding")
-    print("2) Decoding")
-    o = input()
-    if o == "1":
-        encoding.encode()
-    if o == "2":
-        encoding.decode()
+# def menu_encode():
+#     print("Choose what you'd like to work on:")
+#     print("1) Encoding")
+#     print("2) Decoding")
+#     o = input()
+#     if o == "1":
+#         encoding.encode()
+#     if o == "2":
+#         encoding.decode()
 
 
 def menu_encrypt():
@@ -139,14 +139,14 @@ def menu_asym():
 
 os.makedirs("dics", exist_ok=True)
 print("Choose what you'd like to work on:")
-print("1) Encoding and decoding")
+print("1) Encoding a string")
 print("2) Hashing and attacking a hashed password")
 print("3) Symmetric encryption and decryption")
 print("4) Asymmetric encryption and decryption")
 print("5) Quit")
 o = input()
 if o == "1":
-    menu_encode()
+    encoding.encode()
 if o == "2":
     menu_hash()
 if o == "3":
