@@ -37,6 +37,7 @@ def hashing():
     h.update(
         to_hash.encode())  # update adds the stuff you want to hash, encode is because youhave to give it something binary, not a string
     print(h.hexdigest())  # hexdigest gives you the hash.yeyyyyyy done
+    return h.hexdigest()
 
 
 def choose_dictionary():
